@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+      "baseUrl": ".",
+      "paths": {
+        "asimplevectors/*": ["asimplevectors/src/*"]
+      },
+      "esModuleInterop": true,  
+    },
+    "include": ["example/**/*", "asimplevectors/**/*"]
+  }
+  

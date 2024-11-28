@@ -44,3 +44,5 @@ install_dependency_dev.sh
 .env
 Dockerfile_dev
 package-lock.json
+typescript/**/*.js
+typescript/**/*.js.map

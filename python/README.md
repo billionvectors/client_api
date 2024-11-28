@@ -12,8 +12,10 @@ asimplevectors Client is a Python package providing an asynchronous API client t
 - **Async Support**: Fully asynchronous API for high-performance applications.
 
 ## Installation
-
-pip installation will be supported soon.
+Quick Install with pip command
+```bash
+pip install asimplevectors
+```
 
 ## Requirements
 - [asimplevectors](https://github.com/billionvectors/asimplevectors)
@@ -107,8 +109,8 @@ asyncio.run(manage_tokens())
 ### Setting up the development environment
 1. Setup [asimplevectors](https://github.com/billionvectors/asimplevectors) server from docker
 ```bash
-docker pull billionvectors/asimplevectors:0.2.0
-docker run -p 21001:21001 -p 21002:21002 asimplevectors:0.2.0
+docker pull billionvectors/asimplevectors:latest
+docker run -p 21001:21001 -p 21002:21002 asimplevectors:latest
 ```
 
 2. Clone the repository:
