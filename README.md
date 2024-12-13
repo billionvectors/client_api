@@ -14,7 +14,7 @@ asimplevectors Client is a  providing an asynchronous API client to interact wit
 ## Support Languages
 
 - Python ([guide](python/README.md))
-- Javascript
+- Typescript/Javascript ([guide](typescript/README.md))
 - C#
 
 ## License

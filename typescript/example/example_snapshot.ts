@@ -2,6 +2,8 @@ import * as fs from "fs";
 import * as path from "path";
 import { ASimpleVectorsClient } from "../asimplevectors/src";
 
+// The following TypeScript API for snapshots may function unpredictably.
+// This will be fixed in the next patch.
 async function exampleSnapshot(client: ASimpleVectorsClient): Promise<void> {
   try {
     // Step 1: Create space 'spacename'
