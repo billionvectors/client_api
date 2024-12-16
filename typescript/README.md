@@ -2,6 +2,7 @@
 
 # asimplevectors Client Library (TypeScript)
 
+[asimplevectors](https://docs.asimplevectors.com/) is a high-performance vector database optimized for retrieval-augmented generation (RAG) vector database.
 asimplevectors Client is a TypeScript library providing an asynchronous API client to interact with the asimplevectors service, supporting vector management, search, space configuration, and RBAC-based security.
 
 ## Features
@@ -158,17 +159,3 @@ manageTokens().catch(console.error);
    ```
 
 ---
-
-## Contributing
-
-We welcome contributions to improve this library. Submit issues or pull requests on the [GitHub repository](https://github.com/billionvectors/client_api).
-
----
-
-### Differences from Python Version
-
-- The TypeScript client is designed for JavaScript/TypeScript environments, ensuring compatibility with Node.js.
-- Uses JavaScript arrays instead of numpy for vector data.
-- Provides type safety and improved developer experience with TypeScript.
-
-Let me know if additional details are needed! 🚀

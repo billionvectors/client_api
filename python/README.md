@@ -1,5 +1,6 @@
 # asimplevectors Client Library
 
+[asimplevectors](https://docs.asimplevectors.com/) is a high-performance vector database optimized for retrieval-augmented generation (RAG) vector database.
 asimplevectors Client is a Python package providing an asynchronous API client to interact with the asimplevectors service, supporting vector management, search, space configuration, and RBAC-based security.
 
 ## Features

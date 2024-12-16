@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35013.160
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "asimplevectors", "asimplevectors.csproj", "{3CF7F368-A306-423D-95EC-6551555336E8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "asimplevectors", "asimplevectors\asimplevectors.csproj", "{3CF7F368-A306-423D-95EC-6551555336E8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "asimplevectors.Tests", "..\asimpleVectors.Tests\asimplevectors.Tests.csproj", "{77FFC524-FC85-46F3-A84A-948AF5D114B7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "asimplevectors.Tests", "asimplevectors.Tests\asimplevectors.Tests.csproj", "{77FFC524-FC85-46F3-A84A-948AF5D114B7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "asimplevectors.Example", "asimplevectors.Example\asimplevectors.Example.csproj", "{AA52886A-CE67-4DA4-832A-ED9619CF3C6A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{77FFC524-FC85-46F3-A84A-948AF5D114B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{77FFC524-FC85-46F3-A84A-948AF5D114B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{77FFC524-FC85-46F3-A84A-948AF5D114B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA52886A-CE67-4DA4-832A-ED9619CF3C6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA52886A-CE67-4DA4-832A-ED9619CF3C6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA52886A-CE67-4DA4-832A-ED9619CF3C6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA52886A-CE67-4DA4-832A-ED9619CF3C6A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

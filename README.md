@@ -15,7 +15,7 @@ asimplevectors Client is a  providing an asynchronous API client to interact wit
 
 - Python ([guide](python/README.md))
 - Typescript/Javascript ([guide](typescript/README.md))
-- C#
+- C# ([guide](csharp/asimplevectors/docs/README.md))
 
 ## License
 This project is licensed under the MIT License. See the `LICENSE` file.
