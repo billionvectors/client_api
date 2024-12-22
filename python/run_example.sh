@@ -21,7 +21,8 @@ source venv/bin/activate
 
 # Install dependencies from requirements.txt
 echo "Installing dependencies..."
-pip install -r requirements.txt
+pip install -r requirements.txt > /dev/null 2>&1
+pip install -r example/requirements.txt > /dev/null 2>&1
 
 # Determine the test script to run
 TEST_NAME=${1:-"usage"}

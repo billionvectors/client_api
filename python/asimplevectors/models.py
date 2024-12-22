@@ -147,7 +147,6 @@ class VersionResponse(BaseModel):
 class ListVersionsResponse(BaseModel):
     values: List["VersionInfo"]
 
-
 class VersionInfo(BaseModel):
     id: int
     name: str
@@ -160,7 +159,8 @@ class VectorData(BaseModel):
     id: int
     data: List[float]
     metadata: Any  # Adjust type as needed
-
+    doc: Optional[str] = None  # Document content (optional)
+    doc_tokens: Optional[List[str]] = None  # List of document tokens (optional)
 
 class VectorRequest(BaseModel):
     vectors: List[VectorData]
@@ -168,7 +168,6 @@ class VectorRequest(BaseModel):
 
 class VectorResponse(BaseModel):
     result: str
-
 
 class VectorDataResponse(BaseModel):
     id: int
@@ -203,6 +202,18 @@ class SearchResponse(BaseModel):
     distance: float
     label: int
 
+# Rerank DTOs
+class RerankRequest(BaseModel):
+    vector: List[float]
+    tokens: List[str]
+
+class RerankResponse(BaseModel):
+    vectorUniqueId: int
+    distance: float
+    bm25Score: float
+
+class RerankErrorResponse(BaseModel):
+    error: str
 
 # Snapshot DTOs
 class CreateSnapshotRequest(BaseModel):

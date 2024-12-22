@@ -35,7 +35,7 @@ async def test_vector(client: ASimpleVectorsClient):
             }
         ]
     }
-    await client.create_vector("spacename", upsert_data_1)
+    await client.upsert_vector("spacename", upsert_data_1)
     print("Vectors upserted successfully.")
 
     # Step 3: Get vectors by default version
@@ -55,7 +55,7 @@ async def test_vector(client: ASimpleVectorsClient):
             }
         ]
     }
-    await client.create_vector("spacename", upsert_data_2)
+    await client.upsert_vector("spacename", upsert_data_2)
     print("Vectors upserted to version successfully.")
 
     # Step 5: Get vectors by specific version ID

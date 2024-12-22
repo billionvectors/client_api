@@ -271,11 +271,11 @@ namespace asimplevectors.Services
         }
 
         /// <summary>
-        /// Adds vectors to a specified space.
+        /// Upsert vectors to a specified space.
         /// </summary>
         /// <param name="spaceName">The name of the space to add vectors to.</param>
         /// <param name="vectorRequest">The configuration details of the vectors to add.</param>
-        public async Task CreateVectorAsync(string spaceName, VectorRequest vectorRequest)
+        public async Task UpsertVectorAsync(string spaceName, VectorRequest vectorRequest)
         {
             await SendRequestAsync<object>(HttpMethod.Post, $"/api/space/{spaceName}/vector", vectorRequest);
         }
@@ -367,6 +367,47 @@ namespace asimplevectors.Services
             );
 
             return searchResults;
+        }
+
+        /// <summary>
+        /// Performs reranking of search results using BM25 for a given space.
+        /// </summary>
+        /// <param name="spaceName">The name of the space to perform reranking in.</param>
+        /// <param name="rerankRequest">The rerank request containing vector and token details.</param>
+        /// <returns>A list of rerank results.</returns>
+        public async Task<List<RerankResult>> RerankAsync(string spaceName, RerankRequest rerankRequest)
+        {
+            if (rerankRequest == null)
+            {
+                throw new ArgumentNullException(nameof(rerankRequest), "Rerank request cannot be null.");
+            }
+
+            return await SendRequestAsync<List<RerankResult>>(
+                HttpMethod.Post,
+                $"/api/space/{spaceName}/rerank",
+                rerankRequest
+            );
+        }
+
+        /// <summary>
+        /// Performs reranking of search results using BM25 for a specific version of a space.
+        /// </summary>
+        /// <param name="spaceName">The name of the space to perform reranking in.</param>
+        /// <param name="versionId">The version ID to rerank in.</param>
+        /// <param name="rerankRequest">The rerank request containing vector and token details.</param>
+        /// <returns>A list of rerank results.</returns>
+        public async Task<List<RerankResult>> RerankByVersionAsync(string spaceName, int versionId, RerankRequest rerankRequest)
+        {
+            if (rerankRequest == null)
+            {
+                throw new ArgumentNullException(nameof(rerankRequest), "Rerank request cannot be null.");
+            }
+
+            return await SendRequestAsync<List<RerankResult>>(
+                HttpMethod.Post,
+                $"/api/space/{spaceName}/version/{versionId}/rerank",
+                rerankRequest
+            );
         }
 
         /// <summary>

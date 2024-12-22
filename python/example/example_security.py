@@ -75,7 +75,7 @@ async def test_security(client: ASimpleVectorsClient):
         ]
     }
     try:
-        await client.create_vector("spacename", upsert_data)
+        await client.upsert_vector("spacename", upsert_data)
         print("Vectors upserted successfully.")
     except Exception as e:
         print(f"Failed to upsert vectors: {e}")

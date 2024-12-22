@@ -48,7 +48,7 @@ async def test_search(client: ASimpleVectorsClient):
             }
         ]
     }
-    await client.create_vector("spacename", upsert_vectors_data)
+    await client.upsert_vector("spacename", upsert_vectors_data)
     print("Vectors upserted successfully.")
 
     # Step 3: Search vectors with a specific version ID

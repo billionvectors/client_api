@@ -31,7 +31,7 @@ async function exampleSnapshot(client: ASimpleVectorsClient): Promise<void> {
         { id: 5, data: [0.2, 0.3, 0.4, 0.3], metadata: { label: "fifth" } },
       ],
     };
-    await client.createVector("spacename", upsertData);
+    await client.upsertVector("spacename", upsertData);
     console.log("Vectors upserted successfully.\n");
 
     // Step 3: Create snapshot

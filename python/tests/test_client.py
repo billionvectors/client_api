@@ -122,7 +122,7 @@ class RegressionTest(unittest.TestCase):
             await self.client.create_space(space_request)
 
             await self.log(test_name, 2, "Adding vectors.")
-            await self.client.create_vector("vector_test_space", vector_request)
+            await self.client.upsert_vector("vector_test_space", vector_request)
 
             await self.log(test_name, 3, "Retrieving vectors by version.")
             vectors = await self.client.get_vectors_by_version("vector_test_space", version_id=1)
@@ -153,7 +153,7 @@ class RegressionTest(unittest.TestCase):
             await self.client.create_space(space_request)
 
             await self.log(test_name, 2, "Adding vectors.")
-            await self.client.create_vector("search_test_space", vector_request)
+            await self.client.upsert_vector("search_test_space", vector_request)
 
             await self.log(test_name, 3, "Performing vector search.")
             results = await self.client.search_vector("search_test_space", search_request)
@@ -161,6 +161,51 @@ class RegressionTest(unittest.TestCase):
 
             await self.log(test_name, 4, f"Deleting space: {space_request['name']}.")
             await self.client.delete_space("search_test_space")
+
+        self.loop.run_until_complete(test())
+
+    def test_rerank_operations(self):
+        """
+        Test rerank functionality.
+        """
+        async def test():
+            test_name = "test_rerank_operations"
+            space_request = {"name": "rerank_test_space", "dimension": 3, "metric": "L2"}
+            vector_request = {
+                "vectors": [
+                    {
+                        "id": 1,
+                        "data": [0.1, 0.2, 0.3],
+                        "doc": "This is a test document about vectors.",
+                        "doc_tokens": ["test", "document", "vectors"]
+                    },
+                    {
+                        "id": 2,
+                        "data": [0.4, 0.5, 0.6],
+                        "doc": "Another document with different content.",
+                        "doc_tokens": ["another", "document", "content"]
+                    }
+                ]
+            }
+            rerank_request = {
+                "vector": [0.1, 0.2, 0.3],
+                "tokens": ["test", "vectors"],
+                "top_k": 2
+            }
+
+            await self.log(test_name, 1, f"Creating space: {space_request['name']}.")
+            await self.client.create_space(space_request)
+
+            await self.log(test_name, 2, "Adding vectors with document tokens.")
+            await self.client.upsert_vector("rerank_test_space", vector_request)
+
+            await self.log(test_name, 3, "Performing rerank operation.")
+            results = await self.client.rerank("rerank_test_space", rerank_request)
+            self.assertIsNotNone(results, "Rerank results should not be None.")
+            self.assertGreater(len(results), 0, "Rerank results should contain at least one result.")
+
+            await self.log(test_name, 4, f"Deleting space: {space_request['name']}.")
+            await self.client.delete_space("rerank_test_space")
 
         self.loop.run_until_complete(test())
 

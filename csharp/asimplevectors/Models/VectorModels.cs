@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace asimplevectors.Models
@@ -10,7 +11,11 @@ namespace asimplevectors.Models
     {
         public int Id { get; set; }
         public float[] Data { get; set; }
-        public object Metadata { get; set; }
+        public object? Metadata { get; set; } // Optional metadata
+        public string? Doc { get; set; } // Optional document text
+
+        [JsonPropertyName("doc_tokens")]
+        public List<string>? DocTokens { get; set; } // Optional list of document tokens
     }
 
     public class VectorRequest

@@ -63,6 +63,18 @@ export interface ClusterMetricsResponse {
     distance: number;
     label: number;
   }
+
+  export interface RerankRequest {
+    vector: number[];
+    tokens: string[];
+    top_k: number;
+  }
+
+  export interface RerankResponse {
+    vectorUniqueId: number;
+    distance: number;
+    bm25Score: number;
+  }
   
   export interface VersionResponse {
     id: number;
@@ -86,6 +98,8 @@ export interface ClusterMetricsResponse {
     id: number;
     data: number[];
     metadata: any; // Use specific type for metadata if known
+    doc?: string; // Optional property for document text
+    doc_tokens?: string[]; // Optional property for document tokens
   }
   
   export interface VectorResponse {

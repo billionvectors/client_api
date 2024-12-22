@@ -72,13 +72,72 @@ class Program
                 new VectorData { Id = 2, Data = new float[] { 0.5f, 0.6f, 0.7f, 0.8f }, Metadata = new Dictionary<string, object> { { "meta", "second" } } }
             }
         };
-        await client.CreateVectorAsync("spacename", vectorData);
+        await client.UpsertVectorAsync("spacename", vectorData);
         Console.WriteLine("Vectors upserted successfully.");
 
         Console.WriteLine("Searching vectors in 'spacename'");
         var searchRequest = new SearchRequest { Vector = new float[] { 0.2f, 0.3f, 0.4f, 0.3f } };
         var searchResponse = await client.SearchVectorAsync("spacename", searchRequest);
         Console.WriteLine("Search Response:\n" + string.Join("\n", searchResponse));
+    }
+
+    private static async Task TestRerankOperations(asimplevectorsClient client)
+    {
+        Console.WriteLine("Creating space 'spacename' for rerank test");
+        var createSpaceData = new SpaceRequest
+        {
+            Name = "spacename",
+            Dimension = 4,
+            Metric = "L2",
+            HnswConfig = new HnswConfig { M = 64, EfConstruct = 500 }
+        };
+        await client.CreateSpaceAsync(createSpaceData);
+        Console.WriteLine("Space 'spacename' created successfully.");
+
+        Console.WriteLine("Upserting vectors with doc and doc_tokens");
+        var vectorData = new VectorRequest
+        {
+            Vectors = new[]
+            {
+            new VectorData
+            {
+                Id = 1,
+                Data = new float[] { 0.1f, 0.2f, 0.3f, 0.4f },
+                Metadata = new Dictionary<string, object> { { "meta", "first" } },
+                Doc = "This is the first document",
+                DocTokens = new List<string> { "this", "is", "the", "first", "document" }
+            },
+            new VectorData
+            {
+                Id = 2,
+                Data = new float[] { 0.5f, 0.6f, 0.7f, 0.8f },
+                Metadata = new Dictionary<string, object> { { "meta", "second" } },
+                Doc = "This is the second document",
+                DocTokens = new List<string> { "this", "is", "the", "second", "document" }
+            }
+        }
+        };
+        await client.UpsertVectorAsync("spacename", vectorData);
+        Console.WriteLine("Vectors upserted successfully.");
+
+        Console.WriteLine("Performing rerank operation");
+        var rerankRequest = new RerankRequest
+        {
+            Vector = new float[] { 0.2f, 0.3f, 0.4f, 0.5f },
+            Tokens = new List<string> { "document", "first" }
+        };
+
+        var rerankResults = await client.RerankAsync("spacename", rerankRequest);
+
+        Console.WriteLine("Rerank Results:");
+        foreach (var result in rerankResults)
+        {
+            Console.WriteLine($"Vector ID: {result.VectorUniqueId}, Distance: {result.Distance}, BM25 Score: {result.BM25Score}");
+        }
+
+        Console.WriteLine("Deleting space 'spacename' after rerank test");
+        await client.DeleteSpaceAsync("spacename");
+        Console.WriteLine("Space 'spacename' deleted successfully.");
     }
 
     private static async Task TestSecurityOperations(asimplevectorsClient client)
@@ -146,7 +205,7 @@ class Program
 
         try
         {
-            await client.CreateVectorAsync("spacename", vectorData);
+            await client.UpsertVectorAsync("spacename", vectorData);
             Console.WriteLine("Vectors upserted successfully.");
         }
         catch (Exception ex)
@@ -218,7 +277,6 @@ class Program
         await client.RestoreSnapshotAsync(snapshotDate);
         Console.WriteLine("Snapshot restored successfully.");
     }
-
 
     private static async Task TestSpaceOperations(asimplevectorsClient client)
     {
@@ -318,7 +376,7 @@ class Program
                 new VectorData { Id = 2, Data = new float[] { 0.5f, 0.6f, 0.7f, 0.8f }, Metadata = new Dictionary<string, object> { { "label", "second" } } }
             }
         };
-        await client.CreateVectorAsync("spacename", upsertData1);
+        await client.UpsertVectorAsync("spacename", upsertData1);
         Console.WriteLine("Vectors upserted successfully.");
 
         Console.WriteLine("Retrieving vectors for default version");
@@ -333,7 +391,7 @@ class Program
                 new VectorData { Id = 3, Data = new float[] { 0.9f, 0.8f, 0.7f, 0.6f }, Metadata = new Dictionary<string, object> { { "label", "third" } } }
             }
         };
-        await client.CreateVectorAsync("spacename", upsertData2);
+        await client.UpsertVectorAsync("spacename", upsertData2);
         Console.WriteLine("Vectors upserted successfully.");
 
         Console.WriteLine("Retrieving vectors for version ID 1");
@@ -371,7 +429,7 @@ class Program
                 new VectorData { Id = 2, Data = new float[] { 0.5f, 0.6f, 0.7f, 0.8f }, Metadata = new Dictionary<string, object> { { "label", "second" } } }
             }
         };
-        await client.CreateVectorAsync("spacename", upsertData);
+        await client.UpsertVectorAsync("spacename", upsertData);
         Console.WriteLine("Vectors upserted successfully.");
 
         Console.WriteLine("Retrieving vectors for default version");
@@ -386,7 +444,7 @@ class Program
                 new VectorData { Id = 3, Data = new float[] { 0.9f, 0.8f, 0.7f, 0.6f }, Metadata = new Dictionary<string, object> { { "label", "third" } } }
             }
         };
-        await client.CreateVectorAsync("spacename", upsertDataVersion);
+        await client.UpsertVectorAsync("spacename", upsertDataVersion);
         Console.WriteLine("Vectors upserted to version successfully.");
 
         Console.WriteLine("Retrieving vectors for version ID 1");
@@ -417,6 +475,9 @@ class Program
                     break;
                 case "search":
                     await TestSearchOperations(client);
+                    break;
+                case "rerank":
+                    await TestRerankOperations(client);
                     break;
                 case "security":
                     await TestSecurityOperations(client);

@@ -82,7 +82,7 @@ describe("ASimpleVectorsClient Regression Tests", () => {
     await client.createSpace(spaceRequest);
 
     log(testName, 2, "Adding vectors.");
-    await client.createVector("vector_test_space", vectorRequest);
+    await client.upsertVector("vector_test_space", vectorRequest);
 
     log(testName, 3, "Retrieving vectors by version.");
     const vectors = await client.getVectorsByVersion("vector_test_space", 1);
@@ -108,7 +108,7 @@ describe("ASimpleVectorsClient Regression Tests", () => {
     await client.createSpace(spaceRequest);
 
     log(testName, 2, "Adding vectors.");
-    await client.createVector("search_test_space", vectorRequest);
+    await client.upsertVector("search_test_space", vectorRequest);
 
     log(testName, 3, "Performing vector search.");
     const results = await client.searchVector("search_test_space", searchRequest);

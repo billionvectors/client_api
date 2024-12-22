@@ -32,7 +32,7 @@ async def example_snapshot(client: ASimpleVectorsClient):
                 {"id": 5, "data": [0.2, 0.3, 0.4, 0.3], "metadata": {"label": "fifth"}}
             ]
         }
-        await client.create_vector("spacename", upsert_data)
+        await client.upsert_vector("spacename", upsert_data)
         print("Vectors upserted successfully.\n")
 
         # Step 3: Create snapshot
@@ -68,7 +68,7 @@ async def example_snapshot(client: ASimpleVectorsClient):
                 {"id": 1, "data": [1.0, 1.0, 1.0, 1.0], "metadata": {"label": "modified"}}
             ]
         }
-        await client.create_vector("spacename", modified_vector_data)
+        await client.upsert_vector("spacename", modified_vector_data)
         print("Modified vectors upserted successfully.\n")
 
         # Step 7: Search vectors (before restore)

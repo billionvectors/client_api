@@ -158,7 +158,7 @@ public class asimplevectorsTests : IAsyncLifetime
         await _client.CreateSpaceAsync(spaceRequest);
 
         await Log(testName, 2, "Adding vectors.");
-        await _client.CreateVectorAsync("vector_test_space", vectorRequest);
+        await _client.UpsertVectorAsync("vector_test_space", vectorRequest);
 
         await Log(testName, 3, "Verifying vector storage.");
         var rawVectors = await _client.GetVectorsByVersionAsync("vector_test_space", 1);
@@ -210,7 +210,7 @@ public class asimplevectorsTests : IAsyncLifetime
         await _client.CreateSpaceAsync(spaceRequest);
 
         await Log(testName, 2, "Adding vectors.");
-        await _client.CreateVectorAsync("search_test_space", vectorRequest);
+        await _client.UpsertVectorAsync("search_test_space", vectorRequest);
 
         await Log(testName, 3, "Performing vector search.");
         var results = await _client.SearchVectorAsync("search_test_space", searchRequest);
@@ -220,6 +220,74 @@ public class asimplevectorsTests : IAsyncLifetime
 
         await Log(testName, 4, $"Deleting space: {spaceRequest.Name}.");
         await _client.DeleteSpaceAsync("search_test_space");
+    }
+
+    [Fact]
+    public async Task TestRerankOperationsWithDocAndTokens()
+    {
+        const string testName = "TestRerankOperationsWithDocAndTokens";
+
+        var spaceRequest = new SpaceRequest
+        {
+            Name = "rerank_doc_test_space",
+            Dimension = 3,
+            Metric = "L2"
+        };
+
+        var vectorRequest = new VectorRequest
+        {
+            Vectors = new[]
+            {
+            new VectorData
+            {
+                Id = 1,
+                Data = new float[] { 0.1f, 0.2f, 0.3f },
+                Metadata = new { Label = "test_vector_1" },
+                Doc = "This is a test document about vectors.",
+                DocTokens = new List<string> { "test", "document", "vectors" }
+            },
+            new VectorData
+            {
+                Id = 2,
+                Data = new float[] { 0.4f, 0.5f, 0.6f },
+                Metadata = new { Label = "test_vector_2" },
+                Doc = "Another document with different content.",
+                DocTokens = new List<string> { "another", "document", "content" }
+            }
+        }
+        };
+
+        var rerankRequest = new RerankRequest
+        {
+            Vector = new float[] { 0.1f, 0.2f, 0.3f },
+            Tokens = new List<string> { "test", "vectors" },
+            TopK = 2
+        };
+
+        await Log(testName, 1, $"Creating space: {spaceRequest.Name}.");
+        await _client.CreateSpaceAsync(spaceRequest);
+
+        await Log(testName, 2, "Upserting vectors with documents and tokens.");
+        await _client.UpsertVectorAsync("rerank_doc_test_space", vectorRequest);
+
+        await Log(testName, 3, "Performing rerank operation.");
+        var results = await _client.RerankAsync("rerank_doc_test_space", rerankRequest);
+
+        results.Should().NotBeNullOrEmpty("Rerank results should not be empty.");
+        results.Count.Should().Be(rerankRequest.TopK, $"Expected top {rerankRequest.TopK} results.");
+
+        foreach (var result in results)
+        {
+            _logger.LogInformation(
+                "Vector ID: {VectorId}, Distance: {Distance}, BM25 Score: {BM25Score}",
+                result.VectorUniqueId,
+                result.Distance,
+                result.BM25Score
+            );
+        }
+
+        await Log(testName, 4, $"Deleting space: {spaceRequest.Name}.");
+        await _client.DeleteSpaceAsync("rerank_doc_test_space");
     }
 
     [Fact]

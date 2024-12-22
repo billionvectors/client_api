@@ -42,7 +42,7 @@ async function testVector(client: ASimpleVectorsClient): Promise<void> {
     ],
   };
   try {
-    await client.createVector("spacename", upsertData1);
+    await client.upsertVector("spacename", upsertData1);
     console.log("Vectors upserted successfully.");
   } catch (error) {
     console.error("Failed to upsert vectors:", error);
@@ -72,7 +72,7 @@ async function testVector(client: ASimpleVectorsClient): Promise<void> {
     ],
   };
   try {
-    await client.createVector("spacename", upsertData2);
+    await client.upsertVector("spacename", upsertData2);
     console.log("Vectors upserted to version successfully.");
   } catch (error) {
     console.error("Failed to upsert vectors to version:", error);

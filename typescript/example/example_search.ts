@@ -46,7 +46,7 @@ async function testSearch(client: ASimpleVectorsClient): Promise<void> {
       },
     ],
   };
-  await client.createVector("spacename", upsertVectorsData);
+  await client.upsertVector("spacename", upsertVectorsData);
   console.log("Vectors upserted successfully.");
 
   // Step 3: Search vectors with a specific version ID

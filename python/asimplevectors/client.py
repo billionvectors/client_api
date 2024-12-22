@@ -9,13 +9,15 @@ import numpy as np
 import aiofiles
 from requests_toolbelt import MultipartEncoder
 from pathlib import Path
-from typing import Optional, Any, Dict, Type
+from typing import List, Optional, Dict, Any, Type
+
 from .models import (
     ClusterVote, MembershipConfig, ClusterMetricsResponse,
     SpaceResponse, ListSpacesResponse, SpaceErrorResponse,
     VersionResponse, ListVersionsResponse, VersionErrorResponse,
     VectorResponse, GetVectorsResponse, VectorErrorResponse,
     SearchResponse, SearchErrorResponse,
+    RerankRequest, RerankResponse, RerankErrorResponse,
     SnapshotResponse, ListSnapshotsResponse, SnapshotErrorResponse,
     RbacTokenResponse, ListRbacTokensResponse, RbacTokenErrorResponse,
     KeyValueResponse, ListKeysResponse, KeyValueErrorResponse
@@ -116,6 +118,7 @@ class ASimpleVectorsClient:
             logger.debug(f"Response JSON: {response_json}")
 
             if response_model and response.status_code in {200, 201}:
+                # Handle list response appropriately
                 if isinstance(response_json, list):
                     return [response_model(**item) for item in response_json]
                 return response_model(**response_json)
@@ -389,7 +392,7 @@ class ASimpleVectorsClient:
         return await self.make_request("GET", url, response_model=VersionResponse, error_model=VersionErrorResponse)
 
     # Vector Methods
-    async def create_vector(self, space_name: str, vector_request: Dict) -> None:
+    async def upsert_vector(self, space_name: str, vector_request: Dict) -> None:
         """
         Upserts vectors into the specified space. Supports numpy arrays and lists as input.
 
@@ -413,7 +416,7 @@ class ASimpleVectorsClient:
                     }
                 ]
             }
-            await client.create_vector("example_space", vector_request)
+            await client.upsert_vector("example_space", vector_request)
         """
         url = f"{self.base_url}/space/{space_name}/vector"
 
@@ -510,6 +513,60 @@ class ASimpleVectorsClient:
         """
         url = f"{self.base_url}/space/{space_name}/version/{version_id}/search"
         return await self.make_request("POST", url, data=search_request, response_model=SearchResponse, error_model=SearchErrorResponse)
+
+    async def rerank(self, space_name: str, rerank_request: Dict) -> Optional[List[RerankResponse]]:
+        """
+        Performs reranking on search results using BM25 for a given space.
+
+        :param space_name: Name of the space to perform rerank.
+        :param rerank_request: Dictionary containing the rerank query.
+        :return: List of RerankResponse objects containing rerank results, or None if no matches are found.
+
+        Example:
+            rerank_request = {
+                "vector": [0.25, 0.45, 0.75, 0.85],
+                "tokens": ["test", "vectors"]
+            }
+            results = await client.rerank("example_space", rerank_request)
+            if results:
+                for result in results:
+                    print(f"Vector ID: {result.vectorUniqueId}, Distance: {result.distance}, BM25 Score: {result.bm25Score}")
+        """
+        url = f"{self.base_url}/space/{space_name}/rerank"
+        return await self.make_request(
+            method="POST",
+            url=url,
+            data=rerank_request,
+            response_model=RerankResponse
+        )
+
+    async def rerank_with_version(self, space_name: str, version_id: int, rerank_request: Dict) -> Optional[List[RerankResponse]]:
+        """
+        Performs reranking on search results using BM25 for a specific version of a space.
+
+        :param space_name: Name of the space to perform rerank.
+        :param version_id: ID of the version to perform rerank.
+        :param rerank_request: Dictionary containing the rerank query.
+        :return: List of RerankResponse objects containing rerank results, or None if no matches are found.
+
+        Example:
+            rerank_request = {
+                "vector": [0.25, 0.45, 0.75, 0.85],
+                "tokens": ["test", "vectors"]
+            }
+            results = await client.rerank_with_version("example_space", 1, rerank_request)
+            if results:
+                for result in results:
+                    print(f"Vector ID: {result.vectorUniqueId}, Distance: {result.distance}, BM25 Score: {result.bm25Score}")
+        """
+        url = f"{self.base_url}/space/{space_name}/version/{version_id}/rerank"
+        return await self.make_request(
+            "POST", 
+            url, 
+            data=rerank_request, 
+            response_model=RerankResponse,
+            error_model=RerankErrorResponse
+        )
 
     # Snapshot Methods
     async def create_snapshot(self, snapshot_request: Dict) -> None:
