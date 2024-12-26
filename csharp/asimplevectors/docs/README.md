@@ -11,6 +11,7 @@
 - **RBAC Security**: Manage tokens for role-based access control (RBAC).
 - **Snapshot Management**: Create and manage snapshots of spaces.
 - **Async Support**: Fully asynchronous API for modern, high-performance applications.
+- **Rerank Capability**: Provides reranking of initial search results using advanced scoring techniques like *BM25*. This feature ensures highly relevant results for document retrieval use cases.
 
 ## Installation
 

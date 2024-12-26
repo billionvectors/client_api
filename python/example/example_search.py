@@ -56,7 +56,7 @@ async def test_search(client: ASimpleVectorsClient):
     search_data = {
         "vector": [0.2, 0.3, 0.4, 0.3]
     }
-    response = await client.search_vector("spacename", search_data)
+    response = await client.search("spacename", search_data)
     if response:
         print("Search response:]\n", response)
     
@@ -66,7 +66,7 @@ async def test_search(client: ASimpleVectorsClient):
         "vector": [0.2, 0.3, 0.4, 0.3],
         "filter": "meta == 'first' OR meta == 'second'"
     }
-    response = await client.search_vector("spacename", search_data_with_filter)
+    response = await client.search("spacename", search_data_with_filter)
     if response:
         print("Filtered search response:\n", response)
 

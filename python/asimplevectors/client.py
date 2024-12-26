@@ -491,6 +491,12 @@ class ASimpleVectorsClient:
         url = f"{self.base_url}/space/{space_name}/search"
         return await self.make_request("POST", url, data=search_request, response_model=SearchResponse, error_model=SearchErrorResponse)
 
+    async def search(self, space_name: str, search_request: Dict) -> Optional[SearchResponse]:
+        """
+        Wrapper for search_vector to provide a simpler interface.
+        """
+        return await self.search_vector(space_name, search_request)
+
     async def search_vector_by_version(self, space_name: str, version_id: int, search_request: Dict) -> Optional[SearchResponse]:
         """
         Searches for the nearest neighbors to a given vector within a specific version of a space.
@@ -514,6 +520,12 @@ class ASimpleVectorsClient:
         url = f"{self.base_url}/space/{space_name}/version/{version_id}/search"
         return await self.make_request("POST", url, data=search_request, response_model=SearchResponse, error_model=SearchErrorResponse)
 
+    async def search_by_version(self, space_name: str, version_id: int, search_request: Dict) -> Optional[SearchResponse]:
+        """
+        Wrapper for search_vector_by_version to provide a simpler interface.
+        """
+        return await self.search_vector_by_version(space_name, version_id, search_request)
+        
     async def rerank(self, space_name: str, rerank_request: Dict) -> Optional[List[RerankResponse]]:
         """
         Performs reranking on search results using BM25 for a given space.

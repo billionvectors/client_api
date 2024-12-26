@@ -156,7 +156,7 @@ class RegressionTest(unittest.TestCase):
             await self.client.upsert_vector("search_test_space", vector_request)
 
             await self.log(test_name, 3, "Performing vector search.")
-            results = await self.client.search_vector("search_test_space", search_request)
+            results = await self.client.search("search_test_space", search_request)
             self.assertIsNotNone(results)
 
             await self.log(test_name, 4, f"Deleting space: {space_request['name']}.")
