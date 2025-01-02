@@ -89,11 +89,13 @@ class SpaceRequest(BaseModel):
     dense: Optional[DenseConfig] = None
     sparse: Optional[SparseConfig] = None
     indexes: Optional[Any] = None
+    description: Optional[str] = None
 
 class SpaceResponse(BaseModel):
-    created_time_utc: int
+    id: int
     name: str
-    spaceId: int
+    description: str
+    created_time_utc: int
     updated_time_utc: int
     version: "VersionData"
 
@@ -145,6 +147,7 @@ class VersionResponse(BaseModel):
     updated_time_utc: int
 
 class ListVersionsResponse(BaseModel):
+    total_count: int
     values: List["VersionInfo"]
 
 class VersionInfo(BaseModel):
@@ -153,6 +156,8 @@ class VersionInfo(BaseModel):
     description: Optional[str] = None
     is_default: bool
     tag: Optional[str] = None
+    created_time_utc: int
+    updated_time_utc: int
 
 # Vector DTOs
 class VectorData(BaseModel):
@@ -176,6 +181,7 @@ class VectorDataResponse(BaseModel):
     
 class GetVectorsResponse(BaseModel):
     vectors: List[VectorDataResponse]
+    total_count: int
 
     @classmethod
     def from_response(cls, response_json: dict) -> "GetVectorsResponse":
@@ -230,7 +236,7 @@ class ListSnapshotsResponse(BaseModel):
 
 class SnapshotInfo(BaseModel):
     file_name: str
-
+    date: str
 
 # Security DTOs
 class RbacTokenRequest(BaseModel):
@@ -282,6 +288,7 @@ class KeyValueResponse(BaseModel):
 
 
 class ListKeysResponse(BaseModel):
+    total_count: int
     keys: List[str]
 
 

@@ -11,6 +11,7 @@ using Moq.Protected;
 using Xunit;
 using asimplevectors.Models;
 using Microsoft.Extensions.Logging;
+using System.IO.Compression;
 
 public class asimplevectorsTests : IAsyncLifetime
 {
@@ -73,7 +74,7 @@ public class asimplevectorsTests : IAsyncLifetime
 
         var spaceRequest = new SpaceRequest
         {
-            Name = "test_space",
+            Name = "TestSpaceOperations",
             Dimension = 128,
             Metric = "L2"
         };
@@ -82,10 +83,10 @@ public class asimplevectorsTests : IAsyncLifetime
         await _client.CreateSpaceAsync(spaceRequest);
 
         await Log(testName, 2, $"Retrieving space: {spaceRequest.Name}.");
-        var space = await _client.GetSpaceAsync("test_space");
+        var space = await _client.GetSpaceAsync("TestSpaceOperations");
 
         space.Should().NotBeNull();
-        space.Name.Should().Be("test_space");
+        space.Name.Should().Be("TestSpaceOperations");
 
         var updatedSpace = new SpaceRequest
         {
@@ -93,10 +94,10 @@ public class asimplevectorsTests : IAsyncLifetime
             Metric = "Cosine"
         };
         await Log(testName, 3, $"Updating space: {spaceRequest.Name}.");
-        await _client.UpdateSpaceAsync("test_space", updatedSpace);
+        await _client.UpdateSpaceAsync("TestSpaceOperations", updatedSpace);
 
         await Log(testName, 4, $"Deleting space: {spaceRequest.Name}.");
-        await _client.DeleteSpaceAsync("test_space");
+        await _client.DeleteSpaceAsync("TestSpaceOperations");
     }
 
     [Fact]
@@ -279,8 +280,8 @@ public class asimplevectorsTests : IAsyncLifetime
         foreach (var result in results)
         {
             _logger.LogInformation(
-                "Vector ID: {VectorId}, Distance: {Distance}, BM25 Score: {BM25Score}",
-                result.VectorUniqueId,
+                "Vector ID: {Label}, Distance: {Distance}, BM25 Score: {BM25Score}",
+                result.Label,
                 result.Distance,
                 result.BM25Score
             );
@@ -322,5 +323,49 @@ public class asimplevectorsTests : IAsyncLifetime
 
         await Log(testName, 5, $"Deleting space: {spaceRequest.Name}.");
         await _client.DeleteSpaceAsync("kv_test_space");
+    }
+
+    
+    [Fact]
+    public async Task TestSnapshot()
+    {
+        // Arrange
+        string spaceName = "TestSnapshot";
+
+        var spaceRequest = new SpaceRequest
+        {
+            Name = spaceName,
+            Description = "Test space"
+        };
+        await _client.CreateSpaceAsync(spaceRequest);
+
+        await Log("TestSnapshot", 1, $"Create Snapshot");
+        var snapshotRequest = new CreateSnapshotRequest
+        {
+        };
+        await _client.CreateSnapshotAsync(snapshotRequest);
+
+        var snapshotsResponse = await _client.ListSnapshotsAsync();
+        await Log("TestSnapshot", 2, $"Snapshot Length: {snapshotsResponse.Snapshots.Length}");
+        var latestSnapshot = snapshotsResponse.Snapshots.OrderByDescending(s => s.Date).FirstOrDefault();
+        await Log("TestSnapshot", 3, $"Last Snapshot: {latestSnapshot}");
+        string snapshotDate = latestSnapshot.Date;
+        await Log("TestSnapshot", 4, $"Snapshot Date: {snapshotDate}");
+
+        Assert.NotNull(snapshotDate);
+
+        await Log("TestSnapshot", 5, $"Download Snapshot: {snapshotDate}");
+        Stream result = await _client.DownloadSnapshotAsync(snapshotDate);
+
+        // Assert
+        Assert.NotNull(result);
+
+        using (var archive = new ZipArchive(result, ZipArchiveMode.Read))
+        {
+            Assert.NotNull(archive);
+            Assert.True(archive.Entries.Count > 0);
+        }
+        
+        await _client.DeleteSpaceAsync(spaceName);
     }
 }

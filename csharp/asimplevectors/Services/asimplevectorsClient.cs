@@ -223,10 +223,13 @@ namespace asimplevectors.Services
         /// <summary>
         /// Lists all available spaces.
         /// </summary>
+        /// <param name="start">Optional start index for pagination.</param>
+        /// <param name="limit">Optional limit on the number of results.</param>
         /// <returns>A list of all spaces in the form of <see cref="ListSpacesResponse"/>.</returns>
-        public async Task<ListSpacesResponse> ListSpacesAsync()
+        public async Task<ListSpacesResponse> ListSpacesAsync(int start = 0, int limit = 100)
         {
-            return await SendRequestAsync<ListSpacesResponse>(HttpMethod.Get, "/api/spaces");
+            var query = $"?start={start}&limit={limit}";
+            return await SendRequestAsync<ListSpacesResponse>(HttpMethod.Get, $"/api/spaces{query}");
         }
 
         /// <summary>
@@ -243,10 +246,13 @@ namespace asimplevectors.Services
         /// Retrieves a list of all versions for a specified space.
         /// </summary>
         /// <param name="spaceName">The name of the space whose versions are to be listed.</param>
+        /// <param name="start">Optional start index for pagination.</param>
+        /// <param name="limit">Optional limit on the number of results.</param>
         /// <returns>A list of versions in the form of <see cref="ListVersionsResponse"/>.</returns>
-        public async Task<ListVersionsResponse> ListVersionsAsync(string spaceName)
+        public async Task<ListVersionsResponse> ListVersionsAsync(string spaceName, int start = 0, int limit = 100)
         {
-            return await SendRequestAsync<ListVersionsResponse>(HttpMethod.Get, $"/api/space/{spaceName}/versions");
+            var query = $"?start={start}&limit={limit}";
+            return await SendRequestAsync<ListVersionsResponse>(HttpMethod.Get, $"/api/space/{spaceName}/versions{query}");
         }
 
         /// <summary>
@@ -268,6 +274,16 @@ namespace asimplevectors.Services
         public async Task<VersionResponse> GetDefaultVersionAsync(string spaceName)
         {
             return await SendRequestAsync<VersionResponse>(HttpMethod.Get, $"/api/space/{spaceName}/version");
+        }
+
+        /// <summary>
+        /// Deletes a specific version from a space.
+        /// </summary>
+        /// <param name="spaceName">The name of the space from which the version will be deleted.</param>
+        /// <param name="versionId">The ID of the version to delete.</param>
+        public async Task DeleteVersionAsync(string spaceName, int versionId)
+        {
+            await SendRequestAsync<object>(HttpMethod.Delete, $"/api/space/{spaceName}/version/{versionId}");
         }
 
         /// <summary>
@@ -447,6 +463,21 @@ namespace asimplevectors.Services
         }
 
         /// <summary>
+        /// Downloads a specified snapshot.
+        /// </summary>
+        /// <param name="snapshotDate">The date of the snapshot to download.</param>
+        /// <returns>The snapshot as a Stream.</returns>
+        public async Task<Stream> DownloadSnapshotAsync(string snapshotDate)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{_baseUrl}/api/snapshot/{snapshotDate}/download");
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+
+            response.EnsureSuccessStatusCode();
+
+            return await response.Content.ReadAsStreamAsync();
+        }
+
+        /// <summary>
         /// Creates a new RBAC token.
         /// </summary>
         /// <param name="rbacRequest">The configuration for the new RBAC token.</param>
@@ -511,10 +542,13 @@ namespace asimplevectors.Services
         /// Lists all keys in a specified space.
         /// </summary>
         /// <param name="spaceName">The name of the space.</param>
+        /// <param name="start">Optional start index for pagination.</param>
+        /// <param name="limit">Optional limit on the number of results.</param>
         /// <returns>A list of keys as <see cref="ListKeysResponse"/>.</returns>
-        public async Task<ListKeysResponse> ListKeysAsync(string spaceName)
+        public async Task<ListKeysResponse> ListKeysAsync(string spaceName, int start = 0, int limit = 100)
         {
-            return await SendRequestAsync<ListKeysResponse>(HttpMethod.Get, $"/api/space/{spaceName}/keys");
+            var query = $"?start={start}&limit={limit}";
+            return await SendRequestAsync<ListKeysResponse>(HttpMethod.Get, $"/api/space/{spaceName}/keys{query}");
         }
 
         /// <summary>

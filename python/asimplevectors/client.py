@@ -90,7 +90,8 @@ class ASimpleVectorsClient:
         url: str,
         data: Optional[Dict] = None,
         response_model: Type[Any] = None,
-        error_model: Type[Any] = None
+        error_model: Type[Any] = None,
+        params: Optional[Dict[str, Any]] = None
     ) -> Optional[Any]:
         """
         Make an HTTP request to the API and handle the response.
@@ -100,6 +101,7 @@ class ASimpleVectorsClient:
         :param data: Request payload as a dictionary.
         :param response_model: Expected model for successful response.
         :param error_model: Expected model for error response.
+        :param params: Optional query parameters for the request.
         :return: Parsed response model or None if an error occurs.
         :raises ConnectionError: If the request fails to connect.
         :raises HTTPStatusError: If the server returns an HTTP error status.
@@ -110,7 +112,7 @@ class ASimpleVectorsClient:
             if data:
                 headers['Content-Type'] = 'application/json'
 
-            response = await self.session.request(method, url, json=data, headers=headers)
+            response = await self.session.request(method, url, json=data, headers=headers, params=params)
             logger.debug(f"Received response: {response.status_code}, {response.text}")
             response.raise_for_status()
 
@@ -344,21 +346,25 @@ class ASimpleVectorsClient:
         url = f"{self.base_url}/space/{space_name}/version"
         await self.make_request("POST", url, data=version_request)
 
-    async def list_versions(self, space_name: str) -> Optional[ListVersionsResponse]:
+    async def list_versions(self, space_name: str, start: Optional[int] = 0, limit: Optional[int] = 100) -> Optional[ListVersionsResponse]:
         """
         Lists all versions available for the specified space.
 
         :param space_name: The name of the space whose versions are to be listed.
+        :param start: Optional start index for pagination.
+        :param limit: Optional limit on the number of results.
         :return: ListVersionsResponse object containing details of all versions, or None if no versions exist.
 
         Example:
-            versions = await client.list_versions("example_space")
+            versions = await client.list_versions("example_space", start=0, limit=100)
             if versions and versions.values:
                 for version in versions.values:
                     print(f"Version: {version.name}, ID: {version.id}")
         """
         url = f"{self.base_url}/space/{space_name}/versions"
-        return await self.make_request("GET", url, response_model=ListVersionsResponse, error_model=VersionErrorResponse)
+        params = {'start': start, 'limit': limit}
+
+        return await self.make_request("GET", url, response_model=ListVersionsResponse, error_model=VersionErrorResponse, params=params)
 
     async def get_version_by_id(self, space_name: str, version_id: int) -> Optional[VersionResponse]:
         """
@@ -390,6 +396,22 @@ class ASimpleVectorsClient:
         """
         url = f"{self.base_url}/space/{space_name}/version"
         return await self.make_request("GET", url, response_model=VersionResponse, error_model=VersionErrorResponse)
+
+    async def delete_version(self, space_name: str, version_id: int) -> None:
+        """
+        Deletes a specific version from a space.
+
+        :param space_name: The name of the space from which the version will be deleted.
+        :param version_id: The ID of the version to delete.
+        :raises Exception: For failures during the version deletion process.
+
+        Example:
+            await client.delete_version("example_space", 1)
+            print("Version deleted successfully.")
+        """
+        url = f"{self.base_url}/space/{space_name}/version/{version_id}"
+        await self.make_request("DELETE", url)
+        print(f"Version {version_id} deleted successfully from space '{space_name}'.")
 
     # Vector Methods
     async def upsert_vector(self, space_name: str, vector_request: Dict) -> None:
@@ -876,22 +898,26 @@ class ASimpleVectorsClient:
             else:
                 raise
 
-    async def list_keys(self, space_name: str) -> Optional[ListKeysResponse]:
+    async def list_keys(self, space_name: str, start: Optional[int] = 0, limit: Optional[int] = 100) -> Optional[ListKeysResponse]:
         """
         Lists all keys in a given space.
 
         :param space_name: Name of the space for which keys are to be listed.
+        :param start: Optional start index for pagination.
+        :param limit: Optional limit on the number of results.
         :return: A ListKeysResponse object containing the list of keys or None if no keys are found.
         :raises Exception: For failures during the key retrieval process.
 
         Example:
             space_name = "example_space"
-            keys_response = await client.list_keys(space_name)
+            keys_response = await client.list_keys(space_name, start=0, limit=100)
             if keys_response:
                 print("Keys in space:", keys_response.keys)
         """
         url = f"{self.base_url}/space/{space_name}/keys"
-        return await self.make_request("GET", url, response_model=ListKeysResponse, error_model=KeyValueErrorResponse)
+        params = {'start': start, 'limit': limit}
+
+        return await self.make_request("GET", url, response_model=ListKeysResponse, error_model=KeyValueErrorResponse, params=params)
 
     async def delete_key_value(self, space_name: str, key: str) -> None:
         """

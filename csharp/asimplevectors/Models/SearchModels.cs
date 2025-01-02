@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 
 namespace asimplevectors.Models
 {
     public class SearchRequest
     {
         public float[] Vector { get; set; }
+        
+        [JsonPropertyName("top_k")]
         public int TopK { get; set; }
         public string Filter { get; set; }
     }

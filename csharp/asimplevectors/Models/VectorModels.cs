@@ -26,6 +26,8 @@ namespace asimplevectors.Models
     public class GetVectorsResponse
     {
         public List<VectorData> Vectors { get; set; }
+        [JsonPropertyName("total_count")]
+        public int TotalCount { get; set; }
     }
 
     public class VectorResponse

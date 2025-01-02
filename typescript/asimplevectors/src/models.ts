@@ -52,8 +52,8 @@ export interface ClusterMetricsResponse {
   }
   
   export interface SpaceInfo {
-    name: string;
     id: number;
+    name: string;
     description: string;
     created_time_utc: number;
     updated_time_utc: number;
@@ -87,6 +87,7 @@ export interface ClusterMetricsResponse {
   }
   
   export interface ListVersionsResponse {
+    total_count: number;
     values: VersionResponse[];
   }
   
@@ -116,6 +117,7 @@ export interface ClusterMetricsResponse {
   
   export interface SnapshotInfo {
     file_name: string;
+    date: string;
   }
   
   export interface RbacTokenRequest {
@@ -157,10 +159,10 @@ export interface ClusterMetricsResponse {
   }
   
   export interface ListKeysResponse {
+    total_count: number;
     keys: string[];
   }
   
   export interface ErrorResponse {
     error: string;
   }
-  

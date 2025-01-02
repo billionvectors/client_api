@@ -132,7 +132,7 @@ class Program
         Console.WriteLine("Rerank Results:");
         foreach (var result in rerankResults)
         {
-            Console.WriteLine($"Vector ID: {result.VectorUniqueId}, Distance: {result.Distance}, BM25 Score: {result.BM25Score}");
+            Console.WriteLine($"Vector ID: {result.Label}, Distance: {result.Distance}, BM25 Score: {result.BM25Score}");
         }
 
         Console.WriteLine("Deleting space 'spacename' after rerank test");
@@ -450,6 +450,10 @@ class Program
         Console.WriteLine("Retrieving vectors for version ID 1");
         var versionVectors = await client.GetVectorsByVersionAsync("spacename", versionId: 1, start: 0, limit: 10);
         Console.WriteLine($"Retrieved vectors for version 1:\n{string.Join("\n", versionVectors.Vectors)}");
+
+        Console.WriteLine("Deleting version ID 1 from 'spacename'");
+        await client.DeleteVersionAsync("spacename", 1);
+        Console.WriteLine("Version 1 deleted successfully from 'spacename'.");
     }
 
     public static async Task Main(string[] args)

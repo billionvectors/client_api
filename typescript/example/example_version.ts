@@ -89,6 +89,15 @@ async function testVersion(client: ASimpleVectorsClient): Promise<void> {
   } catch (error) {
     console.error("Failed to retrieve vectors for version 1:", error);
   }
+
+  // Step 6: Delete space
+  console.log("Deleting space 'spacename'");
+  try {
+    await client.deleteSpace("spacename");
+    console.log("Space 'spacename' deleted successfully.");
+  } catch (error) {
+    console.error("Failed to delete space:", error);
+  }
 }
 
 async function main(): Promise<void> {

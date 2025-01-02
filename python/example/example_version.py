@@ -64,6 +64,11 @@ async def test_vector(client: ASimpleVectorsClient):
     if response:
         print("Retrieved vectors for version 1:\n", response)
 
+    # Step 6: Delete vectors by specific version ID
+    print("Deleting version ID 1 from 'spacename'")
+    await client.delete_version("spacename", 1)
+    print("Version 1 deleted successfully.")
+
 async def main():
     client = ASimpleVectorsClient(host="localhost")
     try:

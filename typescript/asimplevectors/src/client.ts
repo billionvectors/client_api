@@ -150,10 +150,13 @@ class ASimpleVectorsClient {
    * Lists all versions for the specified space.
    * 
    * @param spaceName - Name of the space.
+   * @param start - Optional start index for pagination.
+   * @param limit - Optional limit on the number of results.
    * @returns List of versions.
    */
-  async listVersions(spaceName: string): Promise<any> {
-    const response = await this.axiosInstance.get(`/api/space/${spaceName}/versions`);
+  async listVersions(spaceName: string, start: number = 0, limit: number = 100): Promise<any> {
+    const params = { start, limit };
+    const response = await this.axiosInstance.get(`/api/space/${spaceName}/versions`, { params });
     return response.data;
   }
 
@@ -178,6 +181,16 @@ class ASimpleVectorsClient {
   async getDefaultVersion(spaceName: string): Promise<any> {
     const response = await this.axiosInstance.get(`/api/space/${spaceName}/version`);
     return response.data;
+  }
+
+  /**
+   * Deletes a specific version from a space.
+   * 
+   * @param spaceName - Name of the space.
+   * @param versionId - ID of the version to delete.
+   */
+  async deleteVersion(spaceName: string, versionId: number): Promise<void> {
+    await this.axiosInstance.delete(`/api/space/${spaceName}/version/${versionId}`);
   }
 
   /**
@@ -429,10 +442,13 @@ class ASimpleVectorsClient {
    * Lists all keys in a space.
    * 
    * @param spaceName - Name of the space.
+   * @param start - Optional start index for pagination.
+   * @param limit - Optional limit on the number of results.
    * @returns List of keys in the space.
    */
-  async listKeys(spaceName: string): Promise<any> {
-    const response = await this.axiosInstance.get(`/api/space/${spaceName}/keys`);
+  async listKeys(spaceName: string, start: number = 0, limit: number = 100): Promise<any> {
+    const params = { start, limit };
+    const response = await this.axiosInstance.get(`/api/space/${spaceName}/keys`, { params });
     return response.data;
   }
 
