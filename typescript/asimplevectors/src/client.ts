@@ -210,10 +210,14 @@ class ASimpleVectorsClient {
    * @param versionId - ID of the version to retrieve vectors from.
    * @param start - Optional start index for pagination.
    * @param limit - Optional limit for the number of vectors to retrieve.
+   * @param filter - Optional filter for the query.
    * @returns List of vectors from the specified version.
    */
-  async getVectorsByVersion(spaceName: string, versionId: number, start?: number, limit?: number): Promise<any> {
-    const params = { start, limit };
+  async getVectorsByVersion(spaceName: string, versionId: number, start?: number, limit?: number, filter?: string): Promise<any> {
+    const params: any = { start, limit };
+    if (filter) {
+      params.filter = filter;
+    }
     const response = await this.axiosInstance.get(`/api/space/${spaceName}/version/${versionId}/vectors`, { params });
     return response.data;
   }

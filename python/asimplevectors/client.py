@@ -462,7 +462,8 @@ class ASimpleVectorsClient:
         space_name: str,
         version_id: int,
         start: Optional[int] = None,
-        limit: Optional[int] = None
+        limit: Optional[int] = None,
+        filter: Optional[str] = None
     ) -> Optional[GetVectorsResponse]:
         """
         Retrieves vectors from a specific version of a space.
@@ -471,10 +472,11 @@ class ASimpleVectorsClient:
         :param version_id: ID of the version to retrieve vectors for.
         :param start: Optional start index for pagination.
         :param limit: Optional limit for the number of vectors to retrieve.
+        :param filter: Optional filter for the query.  # Updated docstring
         :return: GetVectorsResponse object containing vector details, or None if no vectors are found.
 
         Example:
-            vectors = await client.get_vectors_by_version("example_space", 1, start=0, limit=10)
+            vectors = await client.get_vectors_by_version("example_space", 1, start=0, limit=10, filter="label:example")
             if vectors and vectors.vectors:
                 for vector in vectors.vectors:
                     print(f"Vector ID: {vector.id}")
@@ -485,6 +487,8 @@ class ASimpleVectorsClient:
             params['start'] = start
         if limit is not None:
             params['limit'] = limit
+        if filter is not None:
+            params['filter'] = filter
 
         response = await self.session.get(url, params=params)
         response.raise_for_status()

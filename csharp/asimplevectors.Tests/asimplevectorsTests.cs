@@ -29,9 +29,8 @@ public class asimplevectorsTests : IAsyncLifetime
         _logger = loggerFactory.CreateLogger<asimplevectorsClient>();
 
         // Set up client with logger
-        _client = new asimplevectorsClient("http://localhost:21001", _logger);
+        _client = new asimplevectorsClient("http://127.0.0.1:21001", _logger);
     }
-
 
     public Task InitializeAsync()
     {
@@ -325,7 +324,6 @@ public class asimplevectorsTests : IAsyncLifetime
         await _client.DeleteSpaceAsync("kv_test_space");
     }
 
-    
     [Fact]
     public async Task TestSnapshot()
     {
@@ -357,15 +355,34 @@ public class asimplevectorsTests : IAsyncLifetime
         await Log("TestSnapshot", 5, $"Download Snapshot: {snapshotDate}");
         Stream result = await _client.DownloadSnapshotAsync(snapshotDate);
 
-        // Assert
-        Assert.NotNull(result);
+        // Copy the result stream to a MemoryStream to support seeking
+        var memoryStream = new MemoryStream();
+        await result.CopyToAsync(memoryStream);
+        memoryStream.Seek(0, SeekOrigin.Begin);
 
-        using (var archive = new ZipArchive(result, ZipArchiveMode.Read))
+        // Assert
+        Assert.NotNull(memoryStream);
+
+        // Upload snapshot test
+        await Log("TestSnapshot", 6, $"Upload Snapshot: {snapshotDate}");
+        var tempFilePath = Path.GetTempFileName();
+        using (var fileStream = new FileStream(tempFilePath, FileMode.Create, FileAccess.Write))
         {
-            Assert.NotNull(archive);
-            Assert.True(archive.Entries.Count > 0);
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            await memoryStream.CopyToAsync(fileStream);
         }
-        
+        var fileInfo = new FileInfo(tempFilePath);
+        await _client.UploadSnapshotAsync(fileInfo);
+
+        // Verify if the space exists after uploading the snapshot
+        await Log("TestSnapshot", 7, $"Retrieving space: {spaceName}.");
+        var space = await _client.GetSpaceAsync(spaceName);
+
+        space.Should().NotBeNull();
+        space.Name.Should().Be(spaceName);
+
+        // Cleanup
+        fileInfo.Delete();
         await _client.DeleteSpaceAsync(spaceName);
     }
 }

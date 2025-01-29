@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using System.Text.Json.Serialization;
+using System.Web;
 
 namespace asimplevectors.Services
 {
@@ -17,10 +18,16 @@ namespace asimplevectors.Services
     public class asimplevectorsClient
     {
         private readonly HttpClient _httpClient;
-        private readonly string _baseUrl;
+        private string _baseUrl;
         private readonly ILogger _logger;
         private readonly JsonSerializerOptions _jsonOptions;
         private bool _disposed;
+
+        public string BaseUrl
+        {
+            get => _baseUrl;
+            set => _baseUrl = value;
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="asimplevectorsClient"/> class.
@@ -303,10 +310,17 @@ namespace asimplevectors.Services
         /// <param name="versionId">The version ID to retrieve vectors from. Use 0 for the default version.</param>
         /// <param name="start">Optional start index for pagination.</param>
         /// <param name="limit">Optional limit on the number of results.</param>
+        /// <param name="filter">Optional filter for the query.</param>
         /// <returns>A list of vectors in the form of <see cref="GetVectorsResponse"/>.</returns>
-        public async Task<GetVectorsResponse> GetVectorsByVersionAsync(string spaceName, int versionId = 0, int? start = null, int? limit = null)
+        public async Task<GetVectorsResponse> GetVectorsByVersionAsync(string spaceName, int versionId = 0, int? start = null, int? limit = null, string filter = null)
         {
             var query = $"?start={start}&limit={limit}";
+            if (!string.IsNullOrEmpty(filter))
+            {
+                // URL escape the filter
+                var escapedFilter = HttpUtility.UrlEncode(filter);
+                query += $"&filter={escapedFilter}";
+            }
             Dictionary<string, object> responseJson;
 
             if (versionId > 0)
@@ -347,7 +361,8 @@ namespace asimplevectors.Services
                 };
             }).ToList();
 
-            return new GetVectorsResponse { Vectors = vectors };
+            var totalCount = int.Parse(responseJson["total_count"].ToString());
+            return new GetVectorsResponse { Vectors = vectors, TotalCount = totalCount };
         }
 
         /// <summary>
@@ -475,6 +490,31 @@ namespace asimplevectors.Services
             response.EnsureSuccessStatusCode();
 
             return await response.Content.ReadAsStreamAsync();
+        }
+
+        /// <summary>
+        /// Uploads a snapshot file to restore the system state.
+        /// </summary>
+        /// <param name="file">The snapshot file to upload.</param>
+        public async Task UploadSnapshotAsync(FileInfo file)
+        {
+            if (file == null || !file.Exists)
+            {
+                throw new ArgumentException("File cannot be null and must exist.", nameof(file));
+            }
+
+            using var content = new MultipartFormDataContent();
+            using var fileStream = file.OpenRead();
+            content.Add(new StreamContent(fileStream), "file", file.Name);
+
+            var response = await _httpClient.PostAsync($"{_baseUrl}/api/snapshots/restore", content);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                _logger?.LogError("Error uploading snapshot: {StatusCode} - {Content}", response.StatusCode, responseContent);
+                response.EnsureSuccessStatusCode();
+            }
         }
 
         /// <summary>
